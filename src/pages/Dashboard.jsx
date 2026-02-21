@@ -5,7 +5,15 @@ import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer
 } from 'recharts'
 import { Play, Calendar, CheckCircle2, Sparkles, Send, History as HistoryIcon } from 'lucide-react'
-import { extractSkills, calculateReadinessScore, generateChecklist, generate7DayPlan, generateQuestions } from '../utils/analyzer'
+import {
+    extractSkills,
+    calculateReadinessScore,
+    generateChecklist,
+    generate7DayPlan,
+    generateQuestions,
+    generateCompanyIntel,
+    generateDynamicRounds
+} from '../utils/analyzer'
 import { saveAnalysis, getHistory } from '../utils/storage'
 
 const Dashboard = () => {
@@ -31,11 +39,16 @@ const Dashboard = () => {
         // Simulate thinking process
         setTimeout(() => {
             const extractedSkills = extractSkills(jdText)
+            const companyIntel = generateCompanyIntel(company)
+            const dynamicRounds = generateDynamicRounds(companyIntel, extractedSkills)
+
             const mockResult = {
                 company,
                 role,
                 jdText,
                 extractedSkills,
+                companyIntel,
+                dynamicRounds,
                 checklist: generateChecklist(extractedSkills),
                 plan: generate7DayPlan(extractedSkills),
                 questions: generateQuestions(extractedSkills)

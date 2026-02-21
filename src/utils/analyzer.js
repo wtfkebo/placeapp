@@ -84,6 +84,89 @@ export const generate7DayPlan = (extractedSkills) => {
     ];
 };
 
+export const generateCompanyIntel = (companyName) => {
+    const name = (companyName || '').toLowerCase()
+    const enterpriseKeywords = ['amazon', 'google', 'microsoft', 'netflix', 'apple', 'meta', 'infosys', 'tcs', 'wipro', 'hcl', 'accenture', 'capgemini', 'oracle', 'sap', 'ibm']
+    const midSizeKeywords = ['swiggy', 'zomato', 'ola', 'paytm', 'phonepe', 'uber', 'lyft', 'airbnb', 'stripe']
+
+    let intel = {
+        name: companyName || 'Direct Apply',
+        industry: 'Technology Services',
+        sizeCategory: 'Startup (<200)',
+        hiringFocus: 'Practical problem solving + stack depth'
+    }
+
+    if (enterpriseKeywords.some(k => name.includes(k))) {
+        intel.sizeCategory = 'Enterprise (2000+)'
+        intel.hiringFocus = 'Structured DSA + core CS fundamentals'
+    } else if (midSizeKeywords.some(k => name.includes(k))) {
+        intel.sizeCategory = 'Mid-size (200–2000)'
+        intel.hiringFocus = 'Scalability + system architecture + domain expertise'
+    }
+
+    if (name.includes('bank') || name.includes('finance') || name.includes('pay')) intel.industry = 'Fintech'
+    if (name.includes('health')) intel.industry = 'Healthtech'
+    if (name.includes('crypto') || name.includes('chain')) intel.industry = 'Blockchain / Web3'
+
+    return intel
+}
+
+export const generateDynamicRounds = (intel, extractedSkills) => {
+    const skills = Object.values(extractedSkills).flat().map(s => s.toLowerCase())
+    const isEnterprise = intel.sizeCategory === 'Enterprise (2000+)'
+    const hasDSA = skills.some(s => ['dsa', 'core cs', 'algorithm'].includes(s))
+    const hasWeb = skills.some(s => ['react', 'node.js', 'javascript', 'next.js'].includes(s))
+
+    if (isEnterprise) {
+        return [
+            {
+                round: "Round 1: Online Assessment",
+                focus: "DSA + Aptitude",
+                why: "To filter large candidate pools based on algorithmic logic and basic core CS concepts."
+            },
+            {
+                round: "Round 2: Technical Interview I",
+                focus: "Deep DSA (Data Structures)",
+                why: "Focuses specifically on how you manage data and optimize time/space complexity."
+            },
+            {
+                round: "Round 3: Technical Interview II",
+                focus: hasWeb ? "System Design & Tech Stack" : "Advanced DSA + Core CS",
+                why: "Evaluates your ability to build large-scale systems or solve complex abstract problems."
+            },
+            {
+                round: "Round 4: Bar Raiser / HM Round",
+                focus: "Cultural Fit + High-level Thinking",
+                why: "Ensures you meet the company's long-term excellence standards and fit their culture."
+            }
+        ]
+    } else {
+        // Startup/Mid-size flow
+        return [
+            {
+                round: "Round 1: Exploratory Call / Task",
+                focus: "Project Review or Take-home Task",
+                why: "Startups need to see quickly if you can actually build something functional and clean."
+            },
+            {
+                round: "Round 2: Practical Coding",
+                focus: hasWeb ? "React/Node Live Build" : "Core Feature Implementation",
+                why: "Testing your real-world development speed and familiarity with your primary tech stack."
+            },
+            {
+                round: "Round 3: System Discussion",
+                focus: "Product Logic + Scalability",
+                why: "Evaluating how you think about business problems and translate them into code."
+            },
+            {
+                round: "Round 4: Culture Fit / Founder Round",
+                focus: "Ownership + Alignment",
+                why: "In smaller teams, your personal drive and alignment with the mission are as critical as your code."
+            }
+        ]
+    }
+}
+
 export const generateQuestions = (extractedSkills) => {
     const skills = Object.values(extractedSkills).flat();
     const questions = [];

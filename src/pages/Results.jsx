@@ -3,7 +3,7 @@ import { useLocation, Navigate, Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import {
     ArrowLeft, CheckCircle2, ListChecks, CalendarDays, HelpCircle,
-    Copy, Download, BrainCircuit, Rocket, Activity
+    Copy, Download, BrainCircuit, Rocket, Activity, Building2
 } from 'lucide-react'
 import { getHistory, updateAnalysis } from '../utils/storage'
 
@@ -170,6 +170,60 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                     </CardContent>
                 </Card>
 
+                {/* Company Intel Block */}
+                <Card className="lg:col-span-2 bg-gradient-to-br from-slate-50 to-white border-primary/10">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <Building2 size={18} className="text-primary" /> Company Intelligence
+                        </CardTitle>
+                        <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold uppercase">Heuristic Analysis</span>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Industry</label>
+                                <p className="text-sm font-bold text-slate-900">{activeResult.companyIntel?.industry || 'Technology Services'}</p>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Size Category</label>
+                                <p className="text-sm font-bold text-slate-900">{activeResult.companyIntel?.sizeCategory || 'Startup (<200)'}</p>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hiring Focus</label>
+                                <p className="text-sm font-bold text-primary">{activeResult.companyIntel?.hiringFocus || 'General Competency'}</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Round Mapping Timeline */}
+                <Card className="lg:col-span-1 row-span-2 border-primary/10">
+                    <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <Rocket size={18} className="text-primary" /> Interview Round Flow
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                        <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-primary/20 before:via-primary/20 before:to-transparent">
+                            {(activeResult.dynamicRounds || []).map((round, idx) => (
+                                <div key={idx} className="relative flex items-start gap-6 group">
+                                    <div className={`absolute left-0 mt-1.5 w-10 h-10 rounded-full border-4 border-white flex items-center justify-center text-xs font-bold shadow-sm transition-all z-10 ${idx === 0 ? 'bg-primary text-white scale-110 ring-4 ring-primary/10' : 'bg-slate-100 text-slate-500'
+                                        }`}>
+                                        {idx + 1}
+                                    </div>
+                                    <div className="ml-12 space-y-1.5">
+                                        <h4 className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">{round.round}</h4>
+                                        <div className="text-[10px] font-bold text-primary/60 uppercase tracking-wider">{round.focus}</div>
+                                        <p className="text-xs text-slate-500 leading-relaxed bg-slate-50/50 p-2 rounded-lg border border-slate-100">
+                                            {round.why}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+
                 {/* 7-Day Plan with Export */}
                 <Card className="lg:col-span-2">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -281,6 +335,12 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                         </button>
                     </div>
                 </div>
+            </div>
+
+            <div className="mt-8 text-center">
+                <p className="text-[10px] text-slate-400 font-medium italic">
+                    Demo Mode: Company intel generated heuristically.
+                </p>
             </div>
         </div>
     )
