@@ -9,37 +9,33 @@ import { getHistory, updateAnalysis } from '../utils/storage'
 
 const Results = () => {
     const location = useLocation()
-    const [result, setResult] = useState(null)
-    const [confidenceMap, setConfidenceMap] = useState({})
-    const [currentScore, setCurrentScore] = useState(0)
+    const history = getHistory()
+
+    // Helper to get result from location or history
+    const getTargetResult = () => {
+        const stateResult = location.state?.result
+        if (stateResult?.id) {
+            return history.find(h => h.id === stateResult.id) || stateResult
+        }
+        return history.length > 0 ? history[0] : null
+    }
+
+    const initialResult = getTargetResult()
+    const [result, setResult] = useState(initialResult)
+    const [confidenceMap, setConfidenceMap] = useState(initialResult?.skillConfidenceMap || {})
+    const [currentScore, setCurrentScore] = useState(initialResult?.readinessScore || 0)
 
     useEffect(() => {
-        const loadInitialData = () => {
-            const stateResult = location.state?.result
-            const history = getHistory()
-
-            let active = null
-            if (stateResult?.id) {
-                // If we have an ID from history click, get the LATEST version of that entry
-                active = history.find(h => h.id === stateResult.id) || stateResult
-            } else if (history.length > 0) {
-                // Fallback to latest analysis if direct access
-                active = history[0]
-            }
-
-            if (active) {
-                setResult(active)
-                setConfidenceMap(active.skillConfidenceMap || {})
-                setCurrentScore(active.readinessScore || 0)
-            }
+        const active = getTargetResult()
+        if (active) {
+            setResult(active)
+            setConfidenceMap(active.skillConfidenceMap || {})
+            setCurrentScore(active.readinessScore || 0)
         }
-
-        loadInitialData()
-    }, [location.state?.result])
+    }, [location.state?.result, location.pathname]) // Also trigger on path change
 
     if (!result) {
-        const history = getHistory()
-        if (history.length === 0) return <Navigate to="/dashboard" replace />
+        if (getHistory().length === 0) return <Navigate to="/dashboard" replace />
         return <div className="p-12 text-center text-slate-500">Loading analysis...</div>
     }
 
@@ -153,13 +149,18 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                                             <button
                                                 key={skill}
                                                 onClick={() => toggleSkill(skill)}
-                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 ${isKnown
+                                                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border flex flex-col items-start gap-1 min-w-[120px] ${isKnown
                                                     ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm'
                                                     : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-primary/30'
                                                     }`}
                                             >
-                                                {isKnown ? <CheckCircle2 size={12} /> : <div className="w-2 h-2 rounded-full bg-slate-200" />}
-                                                {skill}
+                                                <div className="flex items-center gap-1.5">
+                                                    {isKnown ? <CheckCircle2 size={12} /> : <div className="w-2 h-2 rounded-full bg-slate-200" />}
+                                                    <span className="text-xs uppercase">{skill}</span>
+                                                </div>
+                                                <span className={`text-[9px] font-medium opacity-70 ${isKnown ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                                    {isKnown ? 'I know this' : 'Need practice'}
+                                                </span>
                                             </button>
                                         )
                                     })}
@@ -177,10 +178,9 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                         </CardTitle>
                         <button
                             onClick={() => copyToClipboard(activeResult.plan.map(d => `${d.day}: ${d.topic}`).join('\n'))}
-                            className="text-slate-400 hover:text-primary transition-colors"
-                            title="Copy Plan"
+                            className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[10px] font-bold text-slate-600 transition-all uppercase tracking-tighter"
                         >
-                            <Copy size={16} />
+                            <Copy size={12} /> Copy Plan
                         </button>
                     </CardHeader>
                     <CardContent className="pt-4">
@@ -206,10 +206,9 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                         </CardTitle>
                         <button
                             onClick={() => copyToClipboard(activeResult.checklist.map(c => `${c.round}:\n- ${c.items.join('\n- ')}`).join('\n\n'))}
-                            className="text-slate-400 hover:text-primary transition-colors"
-                            title="Copy Checklist"
+                            className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[10px] font-bold text-slate-600 transition-all uppercase tracking-tighter"
                         >
-                            <Copy size={16} />
+                            <Copy size={12} /> Copy Round Checklist
                         </button>
                     </CardHeader>
                     <CardContent className="pt-4">
@@ -235,17 +234,16 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                 </Card>
 
                 {/* Likely Interview Questions with Export */}
-                <Card className="lg:col-span-1">
+                <Card className="lg:col-span-1 border-amber-100">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0">
                         <CardTitle className="text-base flex items-center gap-2">
                             <HelpCircle size={18} className="text-amber-500" /> Likely Questions
                         </CardTitle>
                         <button
                             onClick={() => copyToClipboard(activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n'))}
-                            className="text-slate-400 hover:text-primary transition-colors"
-                            title="Copy Questions"
+                            className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 hover:bg-amber-100 rounded-md text-[10px] font-bold text-amber-700 transition-all uppercase tracking-tighter"
                         >
-                            <Copy size={16} />
+                            <Copy size={12} /> Copy Questions
                         </button>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-4">
