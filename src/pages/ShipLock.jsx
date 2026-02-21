@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '../components/ui/Card';
-import { Lock, Unlock, ShieldAlert, ArrowLeft, Ship, CheckCircle2 } from 'lucide-react';
+import { Lock, Unlock, ShieldAlert, ArrowLeft, Ship, CheckCircle2, ShieldCheck, Link as LinkIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const STORAGE_KEY = 'prp_checklist_state';
@@ -31,7 +31,7 @@ const ShipLock = () => {
             const submission = JSON.parse(savedSubmission);
             stepsDone = (submission.steps || []).filter(Boolean).length;
             const links = submission.links || {};
-            linksDone = links.lovable && links.github && links.live;
+            linksDone = !!(links.lovable && links.github && links.live);
         }
 
         setPassedCount(checklistDone);
@@ -40,166 +40,153 @@ const ShipLock = () => {
         setIsAuthorized(checklistDone === TOTAL_CHECKLIST && stepsDone === TOTAL_STEPS && linksDone);
     }, []);
 
-    const allConditionsMet = isAuthorized;
-
     return (
-        <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-6 overflow-hidden relative">
-            {/* Background Decoration */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary rounded-full blur-[120px]"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500 rounded-full blur-[120px]"></div>
-            </div>
+        <div className="min-h-screen bg-[#0a0f1e] text-white flex flex-col items-center justify-center p-6 font-sans">
+            <div className="max-w-2xl w-full flex flex-col items-center">
 
-            <div className="max-w-xl w-full relative z-10">
                 {!isAuthorized ? (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <div className="w-full space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
                         {/* Status Badge */}
                         <div className="flex justify-center">
-                            <div className="px-4 py-1.5 bg-slate-800/80 border border-white/10 rounded-full flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Status: In Progress</span>
+                            <div className="px-5 py-1.5 bg-[#151b2d] border border-white/5 rounded-full flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">STATUS: IN PROGRESS</span>
                             </div>
                         </div>
 
-                        {/* Locked Content */}
-                        <div className="flex flex-col items-center space-y-6">
-                            <div className="w-24 h-24 bg-red-500/20 border border-red-500/30 rounded-full flex items-center justify-center text-red-500 shadow-2xl shadow-red-500/10">
-                                <Lock size={48} className="animate-pulse" />
+                        {/* Locked Icon */}
+                        <div className="flex justify-center">
+                            <div className="w-24 h-24 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center text-red-500">
+                                <Lock size={40} className="stroke-[2.5]" />
                             </div>
-                            <div className="text-center space-y-2">
-                                <h1 className="text-3xl font-black uppercase tracking-tighter">Shipping Portal Locked</h1>
-                                <p className="text-slate-400 text-sm max-w-sm mx-auto">
-                                    Quality Control bypass detected. Please complete all verification steps before deployment.
+                        </div>
+
+                        {/* Text Block */}
+                        <div className="text-center space-y-3">
+                            <h1 className="text-3xl font-black uppercase tracking-tight text-white">SHIPPING PORTAL LOCKED</h1>
+                            <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
+                                Quality Control bypass detected. Please complete all verification steps before deployment.
+                            </p>
+                        </div>
+
+                        {/* Progress Card */}
+                        <div className="bg-white rounded-[2rem] p-10 space-y-10 shadow-2xl">
+                            <div className="space-y-8">
+                                {/* Checklist */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-slate-500">1. TEST CHECKLIST</span>
+                                        <span className={passedCount === TOTAL_CHECKLIST ? 'text-emerald-500' : 'text-slate-400'}>
+                                            {passedCount} / {TOTAL_CHECKLIST}
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full transition-all duration-1000 ease-out ${passedCount === TOTAL_CHECKLIST ? 'bg-emerald-500' : 'bg-slate-800'}`}
+                                            style={{ width: `${(passedCount / TOTAL_CHECKLIST) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+
+                                {/* Build Steps */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-slate-500">2. BUILD STEP PROOF</span>
+                                        <span className={stepCount === TOTAL_STEPS ? 'text-emerald-500' : 'text-slate-400'}>
+                                            {stepCount} / {TOTAL_STEPS}
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full transition-all duration-1000 ease-out ${stepCount === TOTAL_STEPS ? 'bg-emerald-500' : 'bg-slate-800'}`}
+                                            style={{ width: `${(stepCount / TOTAL_STEPS) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+
+                                {/* Artifact Links */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-slate-500">3. ARTIFACT LINKS</span>
+                                        <span className={linksValid ? 'text-emerald-500' : 'text-slate-400'}>
+                                            {linksValid ? 'VALID' : 'MISSING'}
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full transition-all duration-1000 ease-out ${linksValid ? 'bg-emerald-500' : 'bg-slate-800'}`}
+                                            style={{ width: linksValid ? '100%' : '0%' }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end pt-4">
+                                <Link
+                                    to="/prp/proof"
+                                    className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-800 hover:text-primary transition-colors flex items-center gap-2"
+                                >
+                                    PROOF PAGE
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="w-full space-y-10 animate-in zoom-in-95 fade-in duration-700">
+                        {/* Shipped Status Badge */}
+                        <div className="flex justify-center">
+                            <div className="px-5 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">STATUS: SHIPPED</span>
+                            </div>
+                        </div>
+
+                        {/* Shipped Icon */}
+                        <div className="flex justify-center">
+                            <div className="w-24 h-24 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-500">
+                                <Ship size={40} className="stroke-[2.5] animate-bounce" />
+                            </div>
+                        </div>
+
+                        {/* Success Block */}
+                        <div className="text-center space-y-6">
+                            <h1 className="text-3xl font-black uppercase tracking-tight text-white">PROJECT AUTHENTICATED</h1>
+                            <div className="space-y-4 max-w-sm mx-auto">
+                                <p className="text-xl font-medium leading-relaxed italic text-white/90">
+                                    "You built a real product.<br />
+                                    Not a tutorial. Not a clone.<br />
+                                    A structured tool that solves a real problem."
+                                </p>
+                                <p className="text-emerald-500 font-black uppercase tracking-[0.3em] text-[10px]">
+                                    This is your proof of work.
                                 </p>
                             </div>
                         </div>
 
-                        <Card className="bg-slate-800/50 border-white/10 backdrop-blur-md">
-                            <CardContent className="p-8 space-y-8">
-                                <div className="space-y-6">
-                                    {/* Checklist Condition */}
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                                            <span>1. Test Checklist</span>
-                                            <span className={passedCount === TOTAL_CHECKLIST ? 'text-emerald-500' : 'text-slate-400'}>
-                                                {passedCount} / {TOTAL_CHECKLIST}
-                                            </span>
-                                        </div>
-                                        <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                            <div
-                                                className={`h-full transition-all duration-1000 ease-out ${passedCount === TOTAL_CHECKLIST ? 'bg-emerald-500' : 'bg-red-500'}`}
-                                                style={{ width: `${(passedCount / TOTAL_CHECKLIST) * 100}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
-
-                                    {/* Steps Condition */}
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                                            <span>2. Build Step Proof</span>
-                                            <span className={stepCount === TOTAL_STEPS ? 'text-emerald-500' : 'text-slate-400'}>
-                                                {stepCount} / {TOTAL_STEPS}
-                                            </span>
-                                        </div>
-                                        <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                            <div
-                                                className={`h-full transition-all duration-1000 ease-out ${stepCount === TOTAL_STEPS ? 'bg-emerald-500' : 'bg-red-500'}`}
-                                                style={{ width: `${(stepCount / TOTAL_STEPS) * 100}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
-
-                                    {/* Links Condition */}
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                                            <span>3. Artifact Links</span>
-                                            <span className={linksValid ? 'text-emerald-500' : 'text-slate-400'}>
-                                                {linksValid ? 'VALID' : 'MISSING'}
-                                            </span>
-                                        </div>
-                                        <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                                            <div
-                                                className={`h-full transition-all duration-1000 ease-out ${linksValid ? 'bg-emerald-500' : 'bg-red-500'}`}
-                                                style={{ width: linksValid ? '100%' : '0%' }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Link
-                                        to="/prp/07-test"
-                                        className="flex items-center justify-center gap-2 py-4 border border-white/10 hover:bg-white/5 rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all"
-                                    >
-                                        Checklist
-                                    </Link>
-                                    <Link
-                                        to="/prp/proof"
-                                        className="flex items-center justify-center gap-2 py-4 bg-white text-slate-900 hover:bg-slate-100 rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all"
-                                    >
-                                        Proof Page
-                                    </Link>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                ) : (
-                    <div className="space-y-8 animate-in zoom-in-95 fade-in duration-700">
-                        {/* Status Badge */}
-                        <div className="flex justify-center">
-                            <div className="px-4 py-1.5 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Status: Shipped</span>
-                            </div>
-                        </div>
-
-                        {/* Unlocked Content */}
-                        <div className="flex flex-col items-center space-y-6">
-                            <div className="w-24 h-24 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center justify-center text-emerald-500 shadow-2xl shadow-emerald-500/10">
-                                <Ship size={48} className="animate-bounce" />
-                            </div>
-                            <div className="text-center space-y-4">
-                                <h1 className="text-3xl font-black uppercase tracking-tighter">Project Authenticated</h1>
-                                <div className="space-y-2 max-w-sm mx-auto">
-                                    <p className="text-white font-bold leading-relaxed">
-                                        "You built a real product.<br />
-                                        Not a tutorial. Not a clone.<br />
-                                        A structured tool that solves a real problem."
-                                    </p>
-                                    <p className="text-emerald-500 font-bold uppercase tracking-[0.2em] text-[10px]">
-                                        This is your proof of work.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <Card className="bg-slate-800/80 border-emerald-500/30 backdrop-blur-md shadow-2xl shadow-emerald-500/10">
-                            <CardContent className="p-8 space-y-8">
+                        <Card className="bg-[#151b2d] border border-emerald-500/20 rounded-[2rem] p-8 shadow-2xl shadow-emerald-900/10">
+                            <CardContent className="p-0 space-y-8">
                                 <div className="grid grid-cols-3 gap-3">
-                                    <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl flex flex-col items-center gap-2">
-                                        <CheckCircle2 className="text-emerald-500" size={20} />
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 text-center">QC Checked</span>
-                                    </div>
-                                    <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl flex flex-col items-center gap-2">
-                                        <ShieldCheck className="text-emerald-500" size={20} />
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 text-center">Steps Verified</span>
-                                    </div>
-                                    <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl flex flex-col items-center gap-2">
-                                        <LinkIcon className="text-emerald-500" size={20} />
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 text-center">Artifacts OK</span>
-                                    </div>
+                                    {[
+                                        { label: 'QC Checked', icon: CheckCircle2 },
+                                        { label: 'Steps Verified', icon: ShieldCheck },
+                                        { label: 'Artifacts OK', icon: LinkIcon }
+                                    ].map((item, id) => (
+                                        <div key={id} className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl flex flex-col items-center gap-3">
+                                            <item.icon className="text-emerald-500" size={20} />
+                                            <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 text-center">{item.label}</span>
+                                        </div>
+                                    ))}
                                 </div>
 
                                 <button
-                                    onClick={() => alert('Final Distribution Initialized. 🏆')}
-                                    className="w-full py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/30 transition-all active:scale-95 group"
+                                    className="w-full py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-emerald-500/20 transition-all active:scale-95"
                                 >
                                     Confirm Final Shipment
                                 </button>
 
-                                <div className="flex justify-center gap-6">
-                                    <Link to="/prp/proof" className="text-[10px] font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest">Proof Summary</Link>
-                                    <Link to="/prp/07-test" className="text-[10px] font-bold text-slate-500 hover:text-white transition-colors uppercase tracking-widest">Test Logs</Link>
+                                <div className="flex justify-center gap-10">
+                                    <Link to="/prp/proof" className="text-[9px] font-black text-slate-500 hover:text-white transition-colors uppercase tracking-widest">Proof Summary</Link>
+                                    <Link to="/prp/07-test" className="text-[9px] font-black text-slate-500 hover:text-white transition-colors uppercase tracking-widest">Test Logs</Link>
                                 </div>
                             </CardContent>
                         </Card>
