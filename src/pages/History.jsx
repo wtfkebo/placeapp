@@ -8,19 +8,40 @@ const History = () => {
     const [history, setHistory] = useState([])
     const navigate = useNavigate()
 
-    useEffect(() => {
+    const loadHistory = () => {
         setHistory(getHistory())
+    }
+
+    useEffect(() => {
+        loadHistory()
     }, [])
 
     const handleItemClick = (item) => {
         navigate('/dashboard/results', { state: { result: item } })
     }
 
+    const handleClearHistory = () => {
+        if (window.confirm("Are you sure you want to clear your entire analysis history? This cannot be undone.")) {
+            localStorage.removeItem('placement_prep_history')
+            loadHistory()
+        }
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-slate-900">Analysis History</h1>
-                <p className="text-sm text-slate-500">{history.length} entries found</p>
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900">Analysis History</h1>
+                    <p className="text-sm text-slate-500">{history.length} entries found</p>
+                </div>
+                {history.length > 0 && (
+                    <button
+                        onClick={handleClearHistory}
+                        className="text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-all"
+                    >
+                        Clear All
+                    </button>
+                )}
             </div>
 
             {history.length === 0 ? (
