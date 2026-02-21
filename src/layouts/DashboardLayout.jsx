@@ -1,12 +1,13 @@
 import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { LayoutDashboard, BookOpen, ClipboardCheck, Library, UserCircle } from 'lucide-react'
+import { LayoutDashboard, BookOpen, ClipboardCheck, Library, UserCircle, History as HistoryIcon } from 'lucide-react'
 
 const DashboardLayout = () => {
     const location = useLocation()
 
     const navItems = [
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { name: 'History', path: '/dashboard/history', icon: HistoryIcon },
         { name: 'Practice', path: '/dashboard/practice', icon: BookOpen },
         { name: 'Assessments', path: '/dashboard/assessments', icon: ClipboardCheck },
         { name: 'Resources', path: '/dashboard/resources', icon: Library },

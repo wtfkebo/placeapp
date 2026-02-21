@@ -7,6 +7,8 @@ import Practice from './pages/Practice'
 import Assessments from './pages/Assessments'
 import Resources from './pages/Resources'
 import Profile from './pages/Profile'
+import History from './pages/History'
+import Results from './pages/Results'
 
 function App() {
     return (
@@ -18,6 +20,8 @@ function App() {
                 <Route path="assessments" element={<Assessments />} />
                 <Route path="resources" element={<Resources />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="history" element={<History />} />
+                <Route path="results" element={<Results />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
