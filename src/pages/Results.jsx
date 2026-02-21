@@ -9,34 +9,41 @@ import { getHistory, updateAnalysis } from '../utils/storage'
 
 const Results = () => {
     const location = useLocation()
-    const [result, setResult] = useState(location.state?.result || null)
+    const [result, setResult] = useState(null)
     const [confidenceMap, setConfidenceMap] = useState({})
     const [currentScore, setCurrentScore] = useState(0)
 
     useEffect(() => {
-        let activeResult = result
-        if (!activeResult) {
+        const loadInitialData = () => {
+            const stateResult = location.state?.result
             const history = getHistory()
-            if (history.length > 0) {
-                activeResult = history[0]
-                setResult(activeResult)
+
+            let active = null
+            if (stateResult?.id) {
+                // If we have an ID from history click, get the LATEST version of that entry
+                active = history.find(h => h.id === stateResult.id) || stateResult
+            } else if (history.length > 0) {
+                // Fallback to latest analysis if direct access
+                active = history[0]
+            }
+
+            if (active) {
+                setResult(active)
+                setConfidenceMap(active.skillConfidenceMap || {})
+                setCurrentScore(active.readinessScore || 0)
             }
         }
 
-        if (activeResult) {
-            setConfidenceMap(activeResult.skillConfidenceMap || {})
-            setCurrentScore(activeResult.readinessScore)
-        }
-    }, [result])
+        loadInitialData()
+    }, [location.state?.result])
 
-    if (!result && !location.state?.result) {
+    if (!result) {
         const history = getHistory()
         if (history.length === 0) return <Navigate to="/dashboard" replace />
+        return <div className="p-12 text-center text-slate-500">Loading analysis...</div>
     }
 
-    const activeResult = result || location.state?.result
-    if (!activeResult) return <div className="p-8 text-center text-slate-500">Loading results...</div>
-
+    const activeResult = result
     const skills = Object.values(activeResult.extractedSkills).flat()
 
     // Handle skill toggle
@@ -47,11 +54,8 @@ const Results = () => {
         const newMap = { ...confidenceMap, [skill]: newStatus }
         setConfidenceMap(newMap)
 
-        // Calculate live score logic: +2 for 'know', -2 for 'practice' (relative to initial status which is practice)
-        // Actually the requirement says: base score + 2 for known, -2 for practice. 
-        // This means the baseline readinessScore already assumes 'practice' for all? 
-        // Requirement 2 says: "Start from base readinessScore. Then: +2 for each 'know', -2 for each 'practice'".
-        // This calculation needs to be careful not to double count.
+        // Calculate live score logic: +2 for 'know', -2 for 'practice' (relative to baseline)
+        const base = activeResult.baseReadinessScore || activeResult.readinessScore || 0
 
         let bonus = 0
         Object.keys(newMap).forEach(s => {
@@ -59,7 +63,7 @@ const Results = () => {
             else bonus -= 2
         })
 
-        const newScore = Math.max(0, Math.min(100, activeResult.readinessScore + bonus))
+        const newScore = Math.max(0, Math.min(100, base + bonus))
         setCurrentScore(newScore)
 
         // Persist to history
@@ -150,8 +154,8 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                                                 key={skill}
                                                 onClick={() => toggleSkill(skill)}
                                                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 ${isKnown
-                                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm'
-                                                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-primary/30'
+                                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm'
+                                                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-primary/30'
                                                     }`}
                                             >
                                                 {isKnown ? <CheckCircle2 size={12} /> : <div className="w-2 h-2 rounded-full bg-slate-200" />}

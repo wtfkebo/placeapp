@@ -42,7 +42,11 @@ const Dashboard = () => {
             }
 
             const score = calculateReadinessScore(mockResult)
-            const finalResult = { ...mockResult, readinessScore: score }
+            const finalResult = {
+                ...mockResult,
+                readinessScore: score,
+                baseReadinessScore: score
+            }
 
             const saved = saveAnalysis(finalResult)
             setLatestAnalysis(saved)
