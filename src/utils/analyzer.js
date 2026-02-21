@@ -8,7 +8,15 @@ const CATEGORIES = {
 };
 
 export const extractSkills = (text) => {
-    const detected = {};
+    const detected = {
+        'Core CS': [],
+        'Languages': [],
+        'Web': [],
+        'Data': [],
+        'Cloud/DevOps': [],
+        'Testing': [],
+        'Other': []
+    };
     let foundAny = false;
 
     Object.entries(CATEGORIES).forEach(([category, skills]) => {
@@ -23,7 +31,12 @@ export const extractSkills = (text) => {
         }
     });
 
-    return foundAny ? detected : { 'General': ['General fresher stack'] };
+    // Default behavior if no skills detected
+    if (!foundAny) {
+        detected['Other'] = ["Communication", "Problem solving", "Basic coding", "Projects"];
+    }
+
+    return detected;
 };
 
 export const calculateReadinessScore = (data) => {

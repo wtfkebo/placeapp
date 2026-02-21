@@ -62,10 +62,11 @@ const Results = () => {
         const newScore = Math.max(0, Math.min(100, base + bonus))
         setCurrentScore(newScore)
 
-        // Persist to history
+        // Persist to history with strict field updates
         updateAnalysis(activeResult.id, {
             skillConfidenceMap: newMap,
-            readinessScore: newScore
+            readinessScore: newScore,
+            updatedAt: new Date().toISOString()
         })
     }
 

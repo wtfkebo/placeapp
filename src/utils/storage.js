@@ -12,8 +12,18 @@ export const saveAnalysis = (analysis) => {
 };
 
 export const getHistory = () => {
-    const raw = localStorage.getItem(HISTORY_KEY);
-    return raw ? JSON.parse(raw) : [];
+    try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+
+        // Filter out corrupted or incomplete entries
+        return parsed.filter(entry => entry && entry.id && entry.jdText);
+    } catch (e) {
+        console.error("Failed to parse history:", e);
+        return [];
+    }
 };
 
 export const getAnalysisById = (id) => {

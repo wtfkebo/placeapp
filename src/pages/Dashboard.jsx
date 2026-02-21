@@ -22,10 +22,15 @@ const Dashboard = () => {
     const [role, setRole] = useState('')
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [latestAnalysis, setLatestAnalysis] = useState(null)
+    const [historyError, setHistoryError] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
         const history = getHistory()
+        const rawHistory = localStorage.getItem('placement_prep_history')
+        if (rawHistory && history.length < JSON.parse(rawHistory).length) {
+            setHistoryError(true)
+        }
         if (history.length > 0) {
             setLatestAnalysis(history[0])
         }
@@ -33,6 +38,12 @@ const Dashboard = () => {
 
     const handleAnalyze = () => {
         if (!jdText.trim()) return
+
+        const jdLength = jdText.trim().length
+        if (jdLength < 200) {
+            window.confirm("This JD is too short to analyze deeply. Paste full JD for better output. Continue anyway?") || null
+            if (jdLength < 50) return // Hard stop for extremely short inputs
+        }
 
         setIsAnalyzing(true)
 
@@ -42,26 +53,30 @@ const Dashboard = () => {
             const companyIntel = generateCompanyIntel(company)
             const dynamicRounds = generateDynamicRounds(companyIntel, extractedSkills)
 
-            const mockResult = {
-                company,
-                role,
-                jdText,
-                extractedSkills,
-                companyIntel,
-                dynamicRounds,
-                checklist: generateChecklist(extractedSkills),
-                plan: generate7DayPlan(extractedSkills),
-                questions: generateQuestions(extractedSkills)
+            // Strict Analysis Entry Schema
+            const standardizedResult = {
+                id: Date.now().toString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                company: company || "",
+                role: role || "",
+                jdText: jdText,
+                extractedSkills: extractedSkills,
+                companyIntel: companyIntel, // sizeCategory, industry, hiringFocus
+                dynamicRounds: dynamicRounds, // [{ round, focus, why }]
+                checklist: generateChecklist(extractedSkills), // [{ round, items[] }]
+                plan: generate7DayPlan(extractedSkills), // [{ day, topic, details }]
+                questions: generateQuestions(extractedSkills),
+                baseReadinessScore: 0, // Calculated below
+                readinessScore: 0, // Calculated below
+                skillConfidenceMap: {}
             }
 
-            const score = calculateReadinessScore(mockResult)
-            const finalResult = {
-                ...mockResult,
-                readinessScore: score,
-                baseReadinessScore: score
-            }
+            const score = calculateReadinessScore(standardizedResult)
+            standardizedResult.baseReadinessScore = score
+            standardizedResult.readinessScore = score
 
-            const saved = saveAnalysis(finalResult)
+            const saved = saveAnalysis(standardizedResult)
             setLatestAnalysis(saved)
             setIsAnalyzing(false)
 
@@ -85,6 +100,11 @@ const Dashboard = () => {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
+            {historyError && (
+                <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl text-xs font-bold animate-in slide-in-from-top-2">
+                    ⚠️ One saved entry couldn't be loaded. Create a new analysis to rebuild your history.
+                </div>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* JD Analyzer Form */}
