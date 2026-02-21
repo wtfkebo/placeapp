@@ -3,11 +3,28 @@ import { useLocation, Navigate, Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { ArrowLeft, CheckCircle2, ListChecks, CalendarDays, HelpCircle } from 'lucide-react'
 
+import { getHistory } from '../utils/storage'
+
 const Results = () => {
     const location = useLocation()
-    const result = location.state?.result
+    const [result, setResult] = React.useState(location.state?.result || null)
 
-    if (!result) return <Navigate to="/dashboard" replace />
+    React.useEffect(() => {
+        if (!result) {
+            const history = getHistory()
+            if (history.length > 0) {
+                setResult(history[0])
+            }
+        }
+    }, [result])
+
+    if (!result && !location.state?.result) {
+        const history = getHistory()
+        if (history.length === 0) return <Navigate to="/dashboard" replace />
+    }
+
+    const activeResult = result || location.state?.result
+    if (!activeResult) return <div className="p-8 text-center text-slate-500">Loading results...</div>
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -16,7 +33,7 @@ const Results = () => {
                     <ArrowLeft size={18} /> Back to History
                 </Link>
                 <div className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-bold">
-                    Score: {result.readinessScore}/100
+                    Score: {activeResult.readinessScore}/100
                 </div>
             </div>
 
@@ -29,7 +46,7 @@ const Results = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        {Object.entries(result.extractedSkills).map(([category, skills]) => (
+                        {Object.entries(activeResult.extractedSkills).map(([category, skills]) => (
                             <div key={category}>
                                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">{category}</h4>
                                 <div className="flex flex-wrap gap-2">
@@ -53,7 +70,7 @@ const Results = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            {result.plan.map((step, i) => (
+                            {activeResult.plan.map((step, i) => (
                                 <div key={i} className="flex gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 border-l-4 border-l-primary">
                                     <div className="font-bold text-primary min-w-[70px]">{step.day}</div>
                                     <div>
@@ -75,7 +92,7 @@ const Results = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="grid md:grid-cols-2 gap-6">
-                            {result.checklist.map((round, i) => (
+                            {activeResult.checklist.map((round, i) => (
                                 <div key={i} className="space-y-3">
                                     <h4 className="font-bold text-slate-900 text-sm border-b pb-2">{round.round}</h4>
                                     <ul className="space-y-2">
@@ -100,7 +117,7 @@ const Results = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {result.questions.map((q, i) => (
+                        {activeResult.questions.map((q, i) => (
                             <div key={i} className="p-3 bg-slate-50 rounded-lg border border-slate-100 text-sm text-slate-700 leading-relaxed">
                                 <span className="font-bold text-primary mr-2">Q{i + 1}:</span> {q}
                             </div>

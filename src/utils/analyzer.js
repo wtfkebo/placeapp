@@ -12,9 +12,11 @@ export const extractSkills = (text) => {
     let foundAny = false;
 
     Object.entries(CATEGORIES).forEach(([category, skills]) => {
-        const matched = skills.filter(skill =>
-            new RegExp(`\\b${skill.replace('.', '\\.')}\\b`, 'i').test(text)
-        );
+        const matched = skills.filter(skill => {
+            const escapedSkill = skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(?:^|\\s|[,.;])${escapedSkill}(?:$|\\s|[,.;])`, 'i');
+            return regex.test(text);
+        });
         if (matched.length > 0) {
             detected[category] = matched;
             foundAny = true;
