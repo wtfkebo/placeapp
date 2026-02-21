@@ -30,8 +30,8 @@ const DashboardLayout = () => {
                                 key={item.name}
                                 to={item.path}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
-                                        ? 'bg-primary/10 text-primary'
-                                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                                    ? 'bg-primary/10 text-primary'
+                                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                                     }`}
                             >
                                 <item.icon size={20} />
@@ -41,7 +41,13 @@ const DashboardLayout = () => {
                     })}
                 </nav>
 
-                <div className="p-4 border-t border-slate-100">
+                <div className="p-4 border-t border-slate-100 space-y-4">
+                    <Link
+                        to="/prp/07-test"
+                        className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-primary transition-colors"
+                    >
+                        <ClipboardCheck size={14} /> Internal QC Portal
+                    </Link>
                     <div className="flex items-center gap-3 px-3 py-2">
                         <div className="w-8 h-8 rounded-full bg-slate-200 flex-shrink-0"></div>
                         <div className="min-w-0">
