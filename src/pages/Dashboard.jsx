@@ -63,18 +63,18 @@ const Dashboard = () => {
                 jdText: jdText,
                 extractedSkills: extractedSkills,
                 companyIntel: companyIntel, // sizeCategory, industry, hiringFocus
-                dynamicRounds: dynamicRounds, // [{ round, focus, why }]
-                checklist: generateChecklist(extractedSkills), // [{ round, items[] }]
-                plan: generate7DayPlan(extractedSkills), // [{ day, topic, details }]
+                roundMapping: dynamicRounds, // [{ roundTitle, focusAreas[], whyItMatters }]
+                checklist: generateChecklist(extractedSkills), // [{ roundTitle, items[] }]
+                plan7Days: generate7DayPlan(extractedSkills), // [{ day, focus, tasks[] }]
                 questions: generateQuestions(extractedSkills),
-                baseReadinessScore: 0, // Calculated below
-                readinessScore: 0, // Calculated below
+                baseScore: 0, // Calculated below
+                finalScore: 0, // Calculated below
                 skillConfidenceMap: {}
             }
 
             const score = calculateReadinessScore(standardizedResult)
-            standardizedResult.baseReadinessScore = score
-            standardizedResult.readinessScore = score
+            standardizedResult.baseScore = score
+            standardizedResult.finalScore = score
 
             const saved = saveAnalysis(standardizedResult)
             setLatestAnalysis(saved)
@@ -87,7 +87,7 @@ const Dashboard = () => {
 
     const radarData = latestAnalysis ?
         Object.entries(latestAnalysis.extractedSkills).map(([cat, skills]) => ({
-            subject: cat,
+            subject: cat.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()), // Convert camelCase to title
             A: Math.min(skills.length * 20, 100),
             fullMark: 100
         })) : [

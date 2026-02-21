@@ -23,14 +23,14 @@ const Results = () => {
     const initialResult = getTargetResult()
     const [result, setResult] = useState(initialResult)
     const [confidenceMap, setConfidenceMap] = useState(initialResult?.skillConfidenceMap || {})
-    const [currentScore, setCurrentScore] = useState(initialResult?.readinessScore || 0)
+    const [currentScore, setCurrentScore] = useState(initialResult?.finalScore || 0)
 
     useEffect(() => {
         const active = getTargetResult()
         if (active) {
             setResult(active)
             setConfidenceMap(active.skillConfidenceMap || {})
-            setCurrentScore(active.readinessScore || 0)
+            setCurrentScore(active.finalScore || 0)
         }
     }, [location.state?.result, location.pathname]) // Also trigger on path change
 
@@ -51,7 +51,7 @@ const Results = () => {
         setConfidenceMap(newMap)
 
         // Calculate live score logic: +2 for 'know', -2 for 'practice' (relative to baseline)
-        const base = activeResult.baseReadinessScore || activeResult.readinessScore || 0
+        const base = activeResult.baseScore || activeResult.finalScore || 0
 
         let bonus = 0
         Object.keys(newMap).forEach(s => {
@@ -65,7 +65,7 @@ const Results = () => {
         // Persist to history with strict field updates
         updateAnalysis(activeResult.id, {
             skillConfidenceMap: newMap,
-            readinessScore: newScore,
+            finalScore: newScore,
             updatedAt: new Date().toISOString()
         })
     }
@@ -86,10 +86,10 @@ SKILLS DETECTED:
 ${Object.entries(activeResult.extractedSkills).map(([cat, ss]) => `${cat}: ${ss.join(', ')}`).join('\n')}
 
 7-DAY PLAN:
-${activeResult.plan.map(d => `${d.day} - ${d.topic}: ${d.details}`).join('\n')}
+${activeResult.plan7Days.map(d => `${d.day} - ${d.focus}: ${d.tasks.join(', ')}`).join('\n')}
 
 PREPARATION CHECKLIST:
-${activeResult.checklist.map(c => `${c.round}:\n - ${c.items.join('\n - ')}`).join('\n\n')}
+${activeResult.checklist.map(c => `${c.roundTitle}:\n - ${c.items.join('\n - ')}`).join('\n\n')}
 
 TOP 10 INTERVIEW QUESTIONS:
 ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
@@ -140,34 +140,39 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                         <p className="text-xs text-slate-500 mb-4 font-medium italic">
                             Toggle skills to update your readiness score in real-time.
                         </p>
-                        {Object.entries(activeResult.extractedSkills).map(([category, catSkills]) => (
-                            <div key={category}>
-                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{category}</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {catSkills.map(skill => {
-                                        const isKnown = confidenceMap[skill] === 'know'
-                                        return (
-                                            <button
-                                                key={skill}
-                                                onClick={() => toggleSkill(skill)}
-                                                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border flex flex-col items-start gap-1 min-w-[120px] ${isKnown
-                                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm'
-                                                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-primary/30'
-                                                    }`}
-                                            >
-                                                <div className="flex items-center gap-1.5">
-                                                    {isKnown ? <CheckCircle2 size={12} /> : <div className="w-2 h-2 rounded-full bg-slate-200" />}
-                                                    <span className="text-xs uppercase">{skill}</span>
-                                                </div>
-                                                <span className={`text-[9px] font-medium opacity-70 ${isKnown ? 'text-emerald-600' : 'text-slate-400'}`}>
-                                                    {isKnown ? 'I know this' : 'Need practice'}
-                                                </span>
-                                            </button>
-                                        )
-                                    })}
+                        {Object.entries(activeResult.extractedSkills).map(([category, catSkills]) => {
+                            if (catSkills.length === 0) return null;
+                            return (
+                                <div key={category}>
+                                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                                        {category.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {catSkills.map(skill => {
+                                            const isKnown = confidenceMap[skill] === 'know'
+                                            return (
+                                                <button
+                                                    key={skill}
+                                                    onClick={() => toggleSkill(skill)}
+                                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border flex flex-col items-start gap-1 min-w-[120px] ${isKnown
+                                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700 shadow-sm'
+                                                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-primary/30'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-1.5">
+                                                        {isKnown ? <CheckCircle2 size={12} /> : <div className="w-2 h-2 rounded-full bg-slate-200" />}
+                                                        <span className="text-xs uppercase">{skill}</span>
+                                                    </div>
+                                                    <span className={`text-[9px] font-medium opacity-70 ${isKnown ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                                        {isKnown ? 'I know this' : 'Need practice'}
+                                                    </span>
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </CardContent>
                 </Card>
 
@@ -206,17 +211,17 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                     </CardHeader>
                     <CardContent className="pt-2">
                         <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-primary/20 before:via-primary/20 before:to-transparent">
-                            {(activeResult.dynamicRounds || []).map((round, idx) => (
+                            {(activeResult.roundMapping || []).map((round, idx) => (
                                 <div key={idx} className="relative flex items-start gap-6 group">
                                     <div className={`absolute left-0 mt-1.5 w-10 h-10 rounded-full border-4 border-white flex items-center justify-center text-xs font-bold shadow-sm transition-all z-10 ${idx === 0 ? 'bg-primary text-white scale-110 ring-4 ring-primary/10' : 'bg-slate-100 text-slate-500'
                                         }`}>
                                         {idx + 1}
                                     </div>
                                     <div className="ml-12 space-y-1.5">
-                                        <h4 className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">{round.round}</h4>
-                                        <div className="text-[10px] font-bold text-primary/60 uppercase tracking-wider">{round.focus}</div>
+                                        <h4 className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">{round.roundTitle}</h4>
+                                        <div className="text-[10px] font-bold text-primary/60 uppercase tracking-wider">{(round.focusAreas || []).join(', ')}</div>
                                         <p className="text-xs text-slate-500 leading-relaxed bg-slate-50/50 p-2 rounded-lg border border-slate-100">
-                                            {round.why}
+                                            {round.whyItMatters}
                                         </p>
                                     </div>
                                 </div>
@@ -232,7 +237,7 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                             <CalendarDays size={18} className="text-primary" /> 7-Day Strategy
                         </CardTitle>
                         <button
-                            onClick={() => copyToClipboard(activeResult.plan.map(d => `${d.day}: ${d.topic}`).join('\n'))}
+                            onClick={() => copyToClipboard(activeResult.plan7Days.map(d => `${d.day}: ${d.focus}`).join('\n'))}
                             className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[10px] font-bold text-slate-600 transition-all uppercase tracking-tighter"
                         >
                             <Copy size={12} /> Copy Plan
@@ -240,12 +245,12 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div className="space-y-4">
-                            {activeResult.plan.map((step, i) => (
+                            {activeResult.plan7Days.map((step, i) => (
                                 <div key={i} className="flex gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100 border-l-4 border-l-primary transition-colors hover:bg-slate-50">
                                     <div className="font-bold text-primary min-w-[70px] text-sm uppercase tracking-tighter">{step.day}</div>
                                     <div>
-                                        <h5 className="font-bold text-slate-900 text-sm">{step.topic}</h5>
-                                        <p className="text-xs text-slate-500 mt-1 leading-relaxed">{step.details}</p>
+                                        <h5 className="font-bold text-slate-900 text-sm">{step.focus}</h5>
+                                        <p className="text-xs text-slate-500 mt-1 leading-relaxed">{(step.tasks || []).join(', ')}</p>
                                     </div>
                                 </div>
                             ))}
@@ -260,7 +265,7 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                             <ListChecks size={18} className="text-primary" /> Preparation Checklist
                         </CardTitle>
                         <button
-                            onClick={() => copyToClipboard(activeResult.checklist.map(c => `${c.round}:\n- ${c.items.join('\n- ')}`).join('\n\n'))}
+                            onClick={() => copyToClipboard(activeResult.checklist.map(c => `${c.roundTitle}:\n- ${c.items.join('\n- ')}`).join('\n\n'))}
                             className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[10px] font-bold text-slate-600 transition-all uppercase tracking-tighter"
                         >
                             <Copy size={12} /> Copy Round Checklist
@@ -271,7 +276,7 @@ ${activeResult.questions.map((q, i) => `${i + 1}. ${q}`).join('\n')}
                             {activeResult.checklist.map((round, i) => (
                                 <div key={i} className="space-y-3">
                                     <h4 className="font-bold text-slate-900 text-xs border-b border-slate-100 pb-2 flex items-center justify-between">
-                                        {round.round}
+                                        {round.roundTitle}
                                         <span className="text-[10px] text-primary bg-primary/5 px-2 py-0.5 rounded-full">Phase {i + 1}</span>
                                     </h4>
                                     <ul className="space-y-2">

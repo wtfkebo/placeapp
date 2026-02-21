@@ -65,7 +65,7 @@ const History = () => {
                             <CardContent className="p-6 flex items-center justify-between">
                                 <div className="flex gap-6 items-center">
                                     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">
-                                        {item.readinessScore}
+                                        {item.finalScore || item.readinessScore || 0}
                                     </div>
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
