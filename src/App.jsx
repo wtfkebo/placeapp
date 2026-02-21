@@ -9,6 +9,8 @@ import Resources from './pages/Resources'
 import Profile from './pages/Profile'
 import History from './pages/History'
 import Results from './pages/Results'
+import TestChecklist from './pages/TestChecklist'
+import ShipLock from './pages/ShipLock'
 
 function App() {
     return (
@@ -23,6 +25,8 @@ function App() {
                 <Route path="history" element={<History />} />
                 <Route path="results" element={<Results />} />
             </Route>
+            <Route path="/prp/07-test" element={<TestChecklist />} />
+            <Route path="/prp/08-ship" element={<ShipLock />} />
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     )
