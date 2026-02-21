@@ -14,10 +14,25 @@ const Results = () => {
     // Helper to get result from location or history
     const getTargetResult = () => {
         const stateResult = location.state?.result
+        let target = null
+
         if (stateResult?.id) {
-            return history.find(h => h.id === stateResult.id) || stateResult
+            target = history.find(h => h.id === stateResult.id) || stateResult
+        } else {
+            target = history.length > 0 ? history[0] : null
         }
-        return history.length > 0 ? history[0] : null
+
+        if (target) {
+            // Schema Compatibility Layer: Map legacy keys to new ones
+            return {
+                ...target,
+                roundMapping: target.roundMapping || target.dynamicRounds || [],
+                plan7Days: target.plan7Days || target.plan || [],
+                finalScore: target.finalScore || target.readinessScore || 0,
+                baseScore: target.baseScore || target.baseReadinessScore || target.readinessScore || 0
+            }
+        }
+        return null
     }
 
     const initialResult = getTargetResult()

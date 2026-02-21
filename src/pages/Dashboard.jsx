@@ -23,6 +23,7 @@ const Dashboard = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [latestAnalysis, setLatestAnalysis] = useState(null)
     const [historyError, setHistoryError] = useState(false)
+    const [validationError, setValidationError] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -37,15 +38,22 @@ const Dashboard = () => {
     }, [])
 
     const handleAnalyze = () => {
-        if (!jdText.trim()) return
+        if (!jdText.trim()) {
+            setValidationError(true)
+            // Reset validation error after a delay
+            setTimeout(() => setValidationError(false), 3000)
+            return
+        }
 
         const jdLength = jdText.trim().length
         if (jdLength < 200) {
-            window.confirm("This JD is too short to analyze deeply. Paste full JD for better output. Continue anyway?") || null
-            if (jdLength < 50) return // Hard stop for extremely short inputs
+            if (!window.confirm("This JD is too short to analyze deeply. Paste full JD for better output. Continue anyway?")) {
+                return
+            }
         }
 
         setIsAnalyzing(true)
+        setValidationError(false)
 
         // Simulate thinking process
         setTimeout(() => {
@@ -108,13 +116,18 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* JD Analyzer Form */}
-                <Card className="lg:col-span-2 border-primary/20 shadow-md bg-white/50 backdrop-blur-sm">
+                <Card className={`lg:col-span-2 border-primary/20 shadow-md bg-white/50 backdrop-blur-sm transition-all ${validationError ? 'border-red-400 ring-1 ring-red-400' : ''}`}>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-primary">
                             <Sparkles size={20} /> Analyze Job Description
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        {validationError && (
+                            <div className="text-red-500 text-[10px] font-bold uppercase tracking-widest animate-pulse">
+                                Job Description is required to start analysis
+                            </div>
+                        )}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Company Name</label>
@@ -141,13 +154,16 @@ const Dashboard = () => {
                             <label className="text-xs font-bold text-slate-500 uppercase">Paste Job Description</label>
                             <textarea
                                 placeholder="Paste the requirements, responsibilities, and qualifications here..."
-                                className="w-full h-40 px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm resize-none"
+                                className={`w-full h-40 px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm resize-none ${validationError ? 'border-red-200 bg-red-50/30' : ''}`}
                                 value={jdText}
-                                onChange={(e) => setJdText(e.target.value)}
+                                onChange={(e) => {
+                                    setJdText(e.target.value)
+                                    if (e.target.value.trim()) setValidationError(false)
+                                }}
                             />
                         </div>
                         <button
-                            disabled={isAnalyzing || !jdText.trim()}
+                            disabled={isAnalyzing}
                             onClick={handleAnalyze}
                             className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${isAnalyzing ? 'bg-slate-400 cursor-wait' : 'bg-primary hover:bg-primary/90 active:scale-[0.98]'
                                 }`}
@@ -179,13 +195,13 @@ const Dashboard = () => {
                                         strokeWidth="8"
                                         fill="transparent"
                                         strokeDasharray={2 * Math.PI * 56}
-                                        strokeDashoffset={2 * Math.PI * 56 * (1 - (latestAnalysis?.readinessScore || 35) / 100)}
+                                        strokeDashoffset={2 * Math.PI * 56 * (1 - (latestAnalysis?.finalScore || latestAnalysis?.readinessScore || 35) / 100)}
                                         strokeLinecap="round"
                                         className="text-primary transition-all duration-1000 ease-out"
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-3xl font-bold text-slate-900">{latestAnalysis?.readinessScore || 35}</span>
+                                    <span className="text-3xl font-bold text-slate-900">{latestAnalysis?.finalScore || latestAnalysis?.readinessScore || 35}</span>
                                 </div>
                             </div>
                         </CardContent>
