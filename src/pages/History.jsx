@@ -109,7 +109,7 @@ const History = () => {
                                     </div>
 
                                     {/* Dropdown Summary Section */}
-                                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[400px] border-t border-slate-100 bg-slate-50/30' : 'max-h-0'}`}>
+                                    <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[800px] opacity-100 border-t border-slate-100 bg-slate-50/30' : 'max-h-0 opacity-0'}`}>
                                         <div className="p-6 pt-2 space-y-6">
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                                 <div className="space-y-2">

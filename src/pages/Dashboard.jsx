@@ -178,52 +178,47 @@ const Dashboard = () => {
                 </Card>
 
                 {/* Overall Readiness & Quick Actions */}
-                <div className="space-y-8">
-                    <Card className="flex flex-col justify-center items-center py-6">
-                        <CardHeader className="text-center p-0">
-                            <CardTitle className="text-sm text-slate-500 font-bold uppercase tracking-wider">Current Readiness</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center pt-4">
-                            <div className="relative w-32 h-32">
-                                <svg className="w-full h-full transform -rotate-90">
-                                    <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100" />
-                                    <circle
-                                        cx="64"
-                                        cy="64"
-                                        r="56"
-                                        stroke="currentColor"
-                                        strokeWidth="8"
-                                        fill="transparent"
-                                        strokeDasharray={2 * Math.PI * 56}
-                                        strokeDashoffset={2 * Math.PI * 56 * (1 - (latestAnalysis?.finalScore || latestAnalysis?.readinessScore || 35) / 100)}
-                                        strokeLinecap="round"
-                                        className="text-primary transition-all duration-1000 ease-out"
-                                    />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-3xl font-bold text-slate-900">{latestAnalysis?.finalScore || latestAnalysis?.readinessScore || 35}</span>
-                                </div>
-                            </div>
-                        </CardContent>
+                <div className="lg:col-span-1 grid grid-cols-1 gap-4">
+                    <Card className="flex flex-row justify-between items-center px-6 py-4 bg-white border-slate-100 shadow-sm">
+                        <div className="space-y-1">
+                            <h3 className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Readiness</h3>
+                            <span className="text-2xl font-bold text-slate-900">{latestAnalysis?.finalScore || latestAnalysis?.readinessScore || 35}%</span>
+                        </div>
+                        <div className="relative w-16 h-16">
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-100" />
+                                <circle
+                                    cx="32"
+                                    cy="32"
+                                    r="28"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                    fill="transparent"
+                                    strokeDasharray={2 * Math.PI * 28}
+                                    strokeDashoffset={2 * Math.PI * 28 * (1 - (latestAnalysis?.finalScore || latestAnalysis?.readinessScore || 35) / 100)}
+                                    strokeLinecap="round"
+                                    className="text-primary transition-all duration-1000 ease-out"
+                                />
+                            </svg>
+                        </div>
                     </Card>
 
-                    <Card className="p-4 bg-primary text-white border-none shadow-indigo-200 shadow-xl">
-                        <CardHeader className="p-0 mb-4">
-                            <CardTitle className="text-sm flex items-center gap-2">
-                                <HistoryIcon size={16} /> Quick History
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0 space-y-2">
-                            <p className="text-xs opacity-80 leading-relaxed">
-                                You have {getHistory().length} saved analyses. Review your past strategies to improve.
-                            </p>
+                    <Card className="p-6 bg-primary text-white border-none shadow-indigo-200 shadow-lg relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                        <div className="relative z-10 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                    <HistoryIcon size={14} /> Quick History
+                                </h3>
+                                <div className="bg-white/20 px-2 py-0.5 rounded text-[10px] font-bold">{getHistory().length} Entries</div>
+                            </div>
                             <button
                                 onClick={() => navigate('/dashboard/history')}
-                                className="w-full py-2 bg-white/20 hover:bg-white/30 rounded-lg text-xs font-bold transition-all"
+                                className="w-full py-2.5 bg-white text-primary rounded-xl text-xs font-bold transition-all hover:bg-slate-50 active:scale-95 shadow-lg shadow-primary/20"
                             >
-                                View Full History
+                                Open Full Archive
                             </button>
-                        </CardContent>
+                        </div>
                     </Card>
                 </div>
 

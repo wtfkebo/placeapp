@@ -200,18 +200,30 @@ export const generateQuestions = (extractedSkills) => {
         if (pool[skill]) questions.push(pool[skill]);
     });
 
-    // Fallback/General questions
-    if (questions.length < 10) {
-        const general = [
-            "Explain the SDLC process in your previous projects.",
-            "How do you handle merge conflicts in a team setting?",
-            "What is your approach to debugging a production issue?",
-            "Describe a time you optimized a piece of code.",
-            "What are the benefits of using microservices architecture?"
-        ];
-        while (questions.length < 10 && general.length > 0) {
-            questions.push(general.shift());
+    // Fallback/General questions pool
+    const generalPool = [
+        "Explain the SDLC process in your previous projects.",
+        "How do you handle merge conflicts in a team setting?",
+        "What is your approach to debugging a production issue?",
+        "Describe a time you optimized a piece of code for performance.",
+        "What are the benefits of using microservices architecture?",
+        "Explain the importance of unit testing in a large codebase.",
+        "How do you stay updated with the latest tech trends?",
+        "Describe a challenging technical problem you solved recently.",
+        "What is your preference: working solo or in a team? Why?",
+        "How do you handle tight deadlines and pressure?",
+        "Explain the difference between SQL and NoSQL databases.",
+        "What is REST API and what are its key constraints?",
+        "How do you ensure security in your web applications?"
+    ];
+
+    // Ensure we have exactly 10 unique questions
+    let poolIndex = 0;
+    while (questions.length < 10 && poolIndex < generalPool.length) {
+        if (!questions.includes(generalPool[poolIndex])) {
+            questions.push(generalPool[poolIndex]);
         }
+        poolIndex++;
     }
 
     return questions.slice(0, 10);
