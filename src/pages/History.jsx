@@ -70,14 +70,12 @@ const History = () => {
                         return (
                             <Card
                                 key={item.id}
-                                className={`transition-all duration-300 ${isExpanded ? 'border-primary shadow-lg ring-1 ring-primary/20' : 'hover:border-primary/50 cursor-pointer hover:bg-slate-50/50'}`}
+                                className={`transition-all duration-300 cursor-pointer ${isExpanded ? 'border-primary shadow-lg ring-1 ring-primary/20' : 'hover:border-primary/50 hover:bg-slate-50/50'}`}
                                 onClick={() => setExpandedId(isExpanded ? null : item.id)}
                             >
                                 <CardContent className="p-0">
-                                    <div
-                                        className="p-6 flex items-center justify-between"
-                                    >
-                                        <div className="flex gap-6 items-center pointer-events-none">
+                                    <div className="p-6 flex items-center justify-between">
+                                        <div className="flex gap-6 items-center">
                                             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">
                                                 {item.finalScore || item.readinessScore || 0}
                                             </div>
@@ -109,7 +107,7 @@ const History = () => {
                                     </div>
 
                                     {/* Dropdown Summary Section */}
-                                    <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[800px] opacity-100 border-t border-slate-100 bg-slate-50/30' : 'max-h-0 opacity-0'}`}>
+                                    <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100 border-t border-slate-100 bg-slate-50/30' : 'max-h-0 opacity-0'}`}>
                                         <div className="p-6 pt-2 space-y-6">
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                                 <div className="space-y-2">

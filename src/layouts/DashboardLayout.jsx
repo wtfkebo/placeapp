@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { LayoutDashboard, BookOpen, ClipboardCheck, Library, UserCircle, History as HistoryIcon, ShieldCheck } from 'lucide-react'
+import { LayoutDashboard, BookOpen, ClipboardCheck, Library, UserCircle, History as HistoryIcon, ShieldCheck, User } from 'lucide-react'
 
 const DashboardLayout = () => {
     const location = useLocation()
@@ -49,9 +49,11 @@ const DashboardLayout = () => {
                         <ShieldCheck size={16} /> Ready to Ship?
                     </Link>
                     <div className="flex items-center gap-3 px-3 py-2 border border-slate-50 rounded-xl bg-slate-50/50">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0">CP</div>
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                            <User size={16} />
+                        </div>
                         <div className="min-w-0">
-                            <p className="text-sm font-bold text-slate-900 truncate">Candidate Profile</p>
+                            <p className="text-sm font-bold text-slate-900 truncate">User</p>
                             <p className="text-[10px] font-medium text-slate-500 truncate">active_session@prep.local</p>
                         </div>
                     </div>
