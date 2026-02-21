@@ -20,6 +20,14 @@ export const getAnalysisById = (id) => {
     return getHistory().find(h => h.id === id);
 };
 
+export const updateAnalysis = (id, updates) => {
+    const history = getHistory();
+    const updatedHistory = history.map(entry =>
+        entry.id === id ? { ...entry, ...updates } : entry
+    );
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
+};
+
 export const clearHistory = () => {
     localStorage.removeItem(HISTORY_KEY);
 };
