@@ -74,8 +74,10 @@ const History = () => {
                                 onClick={() => setExpandedId(isExpanded ? null : item.id)}
                             >
                                 <CardContent className="p-0">
-                                    <div className="p-6 flex items-center justify-between">
-                                        <div className="flex gap-6 items-center">
+                                    <div
+                                        className="p-6 flex items-center justify-between"
+                                    >
+                                        <div className="flex gap-6 items-center pointer-events-none">
                                             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-bold text-lg">
                                                 {item.finalScore || item.readinessScore || 0}
                                             </div>
@@ -98,12 +100,11 @@ const History = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <button
-                                                onClick={(e) => toggleExpand(e, item.id)}
-                                                className={`p-2 rounded-lg transition-colors ${isExpanded ? 'bg-primary/10 text-primary' : 'text-slate-300 hover:text-primary'}`}
+                                            <div
+                                                className={`p-2 rounded-lg transition-colors ${isExpanded ? 'bg-primary/10 text-primary' : 'text-slate-300'}`}
                                             >
                                                 <ChevronRight className={`transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''}`} />
-                                            </button>
+                                            </div>
                                         </div>
                                     </div>
 

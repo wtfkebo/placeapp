@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { LayoutDashboard, BookOpen, ClipboardCheck, Library, UserCircle, History as HistoryIcon } from 'lucide-react'
+import { LayoutDashboard, BookOpen, ClipboardCheck, Library, UserCircle, History as HistoryIcon, ShieldCheck } from 'lucide-react'
 
 const DashboardLayout = () => {
     const location = useLocation()
@@ -44,9 +44,9 @@ const DashboardLayout = () => {
                 <div className="p-4 border-t border-slate-100 space-y-4">
                     <Link
                         to="/prp/07-test"
-                        className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest hover:text-primary transition-colors"
+                        className="flex items-center justify-center gap-2 w-full py-3 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-sm active:scale-[0.98]"
                     >
-                        <ClipboardCheck size={14} /> Internal QC Portal
+                        <ShieldCheck size={16} /> Ready to Ship?
                     </Link>
                     <div className="flex items-center gap-3 px-3 py-2">
                         <div className="w-8 h-8 rounded-full bg-slate-200 flex-shrink-0"></div>
